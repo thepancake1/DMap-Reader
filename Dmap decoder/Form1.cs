@@ -50,6 +50,10 @@ namespace Dmap_decoder
             Console.WriteLine(width);
             var numScanLines = int.Parse(maxRow) - int.Parse(minRow) + 1;
             Console.WriteLine(numScanLines);
+            var scanLineDataSize = readAFewBytes(ListOfBytes, 2);
+            var mbIsCompressed = readAFewBytes(ListOfBytes, 1);
+            var mRobeChannel = readAFewBytes(ListOfBytes, 1);
+
         }
 
         int amountOfBytesRead;
@@ -68,9 +72,14 @@ namespace Dmap_decoder
                 if (((amountOfBytesToRead + amountOfBytesRead) - i) == 1)
                 {
                     byteHolder = temporaryByteHolder.ToArray();
-                    if (byteHolder.Length != 1)
+                    if (byteHolder.Length == 4)
                     {
                         fewBytes = BitConverter.ToInt32(byteHolder, 0).ToString();
+
+                    }
+                   else if (byteHolder.Length == 2)
+                    {
+                        fewBytes = BitConverter.ToInt16(byteHolder, 0).ToString();
                     }
 
                     else
@@ -91,5 +100,5 @@ namespace Dmap_decoder
 
 
     }
-}
+
 
