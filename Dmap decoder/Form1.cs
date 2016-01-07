@@ -40,7 +40,11 @@ namespace Dmap_decoder
             var height = readAFewBytes(ListOfBytes, 4);
             var AgeGender = readAFewBytes(ListOfBytes, 4);
             var Physique = readAFewBytes(ListOfBytes, 1);
-            var ShapeOrVertex = readAFewBytes(ListOfBytes, 1);
+            var ShapeOrNormals = readAFewBytes(ListOfBytes, 1);
+            var minCol = readAFewBytes(ListOfBytes, 4);
+            var maxCol = readAFewBytes(ListOfBytes, 4);
+            var minRow = readAFewBytes(ListOfBytes, 4);
+            var maxRow = readAFewBytes(ListOfBytes, 4);
 
         }
 
