@@ -55,7 +55,8 @@ namespace Dmap_decoder
                 RLEArrayOfPixels.Clear();
 
 
-                var scanLineDataSize = readAFewBytes(ListOfBytes, 2, "scanLineDataSize");
+                var scanLineDataSize = int.Parse(readAFewBytes(ListOfBytes, 2, "scanLineDataSize"));
+                Console.WriteLine("scanLineDataSize " + scanLineDataSize.ToString());
                 var mbIsCompressed = readAFewBytes(ListOfBytes, 1, "mbIsCompressed");
                 var mRobeChannel = readAFewBytes(ListOfBytes, 1, "mRobeChannel");
                 int mUncompressedPixels = 0;
@@ -81,8 +82,16 @@ namespace Dmap_decoder
                     // into the RLE data where run-time client can start decoding data to obtain a value at a particular pixel 
                     // position x without decoding the entire preceding scanline.
                     // See DMap-To-BMP.sc for examples on how to used these indexes.
-                    int mPixelPosIndexes = int.Parse(readAFewBytes(ListOfBytes, 2, "mPixelPosIndexes", false));
-                    int mDataPosIndexes = int.Parse(readAFewBytes(ListOfBytes, 2, "mDataPosIndexes", false));
+                    for (int x = 0; x < numIndexes; x++)
+                    {
+                        int mPixelPosIndexes = int.Parse(readAFewBytes(ListOfBytes, 2, "mPixelPosIndexes", false));
+
+                    }
+                    for (int x = 0; x < numIndexes; x++)
+                    {
+                        int mDataPosIndexes = int.Parse(readAFewBytes(ListOfBytes, 2, "mDataPosIndexes", false));
+
+                    }
 
                     int headerdatasize = 4 + 1 + (4 * numIndexes);
                     Console.WriteLine("HeaderDataSize " + headerdatasize);
@@ -91,7 +100,8 @@ namespace Dmap_decoder
                     //  Byte 1,2,3  : Pixel info for skin tight data
                     //  Byte 4,5,6  : Pixel info for robe data (if present)
                     //  Repeat
-                    int mRLEArrayOfPixelsVar = int.Parse(readAFewBytes(ListOfBytes, int.Parse(scanLineDataSize) - headerdatasize, "mRLEArrayOfPixelsVar", false));
+                    Console.WriteLine("scanLineDataSize " + scanLineDataSize.ToString());
+                    int mRLEArrayOfPixelsVar = int.Parse(readAFewBytes(ListOfBytes,scanLineDataSize - headerdatasize, "mRLEArrayOfPixelsVar", false, true));
                     List<int> mRLEArrayOfPixels = RLEArrayOfPixels;
 
                     Console.WriteLine("mRLEArrayOfPixels.count " + mRLEArrayOfPixels.Count);
@@ -104,8 +114,9 @@ namespace Dmap_decoder
         List<int> RLEArrayOfPixels = new List<int>();
 
         int amountOfBytesRead;
-        public string readAFewBytes(byte[] file, int amountOfBytesToRead, string stringToDisplay, bool shouldParseAsWholeOrOneByOne = true)
+        public string readAFewBytes(byte[] file, int amountOfBytesToRead, string stringToDisplay, bool shouldParseAsWholeOrOneByOne = true, bool RLEArray = false)
         {
+            //Console.WriteLine("amountOfBytesToRead " + amountOfBytesToRead);
             string fewBytes = System.String.Empty;
             var temporaryBytesRead = 0;
             byte[] byteHolder;
@@ -114,6 +125,8 @@ namespace Dmap_decoder
             {
                 //Console.WriteLine(amountOfBytesToRead);
                 //Console.WriteLine(amountOfBytesRead);
+                Console.WriteLine(file[i]);
+
                 temporaryBytesRead++;
                 temporaryByteHolder.Add(file[i]);
                 if (((amountOfBytesToRead + amountOfBytesRead) - i) == 1)
@@ -141,11 +154,12 @@ namespace Dmap_decoder
                         for (int z = 0; z < byteHolder.Length; z++)
                         {
                             fewBytes = 0.ToString();
+                            if(RLEArray == true)
                             RLEArrayOfPixels.Add(byteHolder[z]);
                         }
 
                     }
-                    Console.WriteLine(fewBytes + " " + stringToDisplay);
+                    Console.WriteLine(stringToDisplay);
                 }
             }
             amountOfBytesRead += temporaryBytesRead;
