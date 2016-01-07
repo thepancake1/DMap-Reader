@@ -64,9 +64,6 @@ namespace Dmap_decoder
                 {
                     if (int.Parse(mRobeChannel) == 0)
                     {
-                        // If robe is present, robe and skin tight are interleaved.  
-                        // i.e. skin tight pixel, robe pixel, skin tight pixel, robe pixel, etc.
-                        // Thus each pixel takes 6 bytes.
                         mUncompressedPixels = int.Parse(readAFewBytes(ListOfBytes, width * 6, "mUncompressedPixels"));
                     }
                     else
@@ -78,10 +75,6 @@ namespace Dmap_decoder
                 {
                     int numIndexes = int.Parse(readAFewBytes(ListOfBytes, 1, "numIndexes") ); // must be > 1
 
-                    // The goal of having index tables (mPixelPosIndexes & mDataPosIndexes) is to provide faster shortcuts 
-                    // into the RLE data where run-time client can start decoding data to obtain a value at a particular pixel 
-                    // position x without decoding the entire preceding scanline.
-                    // See DMap-To-BMP.sc for examples on how to used these indexes.
                     for (int x = 0; x < numIndexes; x++)
                     {
                         int mPixelPosIndexes = int.Parse(readAFewBytes(ListOfBytes, 2, "mPixelPosIndexes", false));
@@ -95,17 +88,16 @@ namespace Dmap_decoder
 
                     int headerdatasize = 4 + 1 + (4 * numIndexes);
                     Console.WriteLine("HeaderDataSize " + headerdatasize);
-                    // The RLE data is an array if chars, organized as follows:
-                    //  Byte 0      : Size of run
-                    //  Byte 1,2,3  : Pixel info for skin tight data
-                    //  Byte 4,5,6  : Pixel info for robe data (if present)
-                    //  Repeat
+                   
                     Console.WriteLine("scanLineDataSize " + scanLineDataSize.ToString());
                     int mRLEArrayOfPixelsVar = int.Parse(readAFewBytes(ListOfBytes,scanLineDataSize - headerdatasize, "mRLEArrayOfPixelsVar", false, true));
                     List<int> mRLEArrayOfPixels = RLEArrayOfPixels;
+                    for (int x = 0;x < mRLEArrayOfPixels.Count; x++)
+                    {
+                        Console.WriteLine("mRLEArrayOfPixels " + mRLEArrayOfPixels[x]);
 
-                    Console.WriteLine("mRLEArrayOfPixels.count " + mRLEArrayOfPixels.Count);
-                    
+                    }
+
                 }
 
             }
@@ -125,7 +117,7 @@ namespace Dmap_decoder
             {
                 //Console.WriteLine(amountOfBytesToRead);
                 //Console.WriteLine(amountOfBytesRead);
-                Console.WriteLine(file[i]);
+                //Console.WriteLine(file[i]);
 
                 temporaryBytesRead++;
                 temporaryByteHolder.Add(file[i]);
@@ -159,14 +151,17 @@ namespace Dmap_decoder
                         }
 
                     }
-                    Console.WriteLine(stringToDisplay);
+                    Console.WriteLine(stringToDisplay + " " +  fewBytes.ToString());
                 }
             }
             amountOfBytesRead += temporaryBytesRead;
             return fewBytes;
         }
 
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
 
+        }
     }
         
 
