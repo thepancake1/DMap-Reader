@@ -81,11 +81,11 @@ namespace Dmap_decoder
                     // into the RLE data where run-time client can start decoding data to obtain a value at a particular pixel 
                     // position x without decoding the entire preceding scanline.
                     // See DMap-To-BMP.sc for examples on how to used these indexes.
-                    int mPixelPosIndexes = int.Parse(readAFewBytes(ListOfBytes, 2, "mPixelPosIndexes"));
-                    int mDataPosIndexes = int.Parse(readAFewBytes(ListOfBytes, 2, "mDataPosIndexes"));
+                    int mPixelPosIndexes = int.Parse(readAFewBytes(ListOfBytes, 2, "mPixelPosIndexes", false));
+                    int mDataPosIndexes = int.Parse(readAFewBytes(ListOfBytes, 2, "mDataPosIndexes", false));
 
                     int headerdatasize = 4 + 1 + (4 * numIndexes);
-
+                    Console.WriteLine("HeaderDataSize " + headerdatasize);
                     // The RLE data is an array if chars, organized as follows:
                     //  Byte 0      : Size of run
                     //  Byte 1,2,3  : Pixel info for skin tight data
@@ -93,6 +93,9 @@ namespace Dmap_decoder
                     //  Repeat
                     int mRLEArrayOfPixelsVar = int.Parse(readAFewBytes(ListOfBytes, int.Parse(scanLineDataSize) - headerdatasize, "mRLEArrayOfPixelsVar", false));
                     List<int> mRLEArrayOfPixels = RLEArrayOfPixels;
+
+                    Console.WriteLine("mRLEArrayOfPixels.count " + mRLEArrayOfPixels.Count);
+                    
                 }
 
             }
