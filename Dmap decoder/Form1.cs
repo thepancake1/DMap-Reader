@@ -34,30 +34,74 @@ namespace Dmap_decoder
         {
             string path = @"C:\\S4_DB43E069_00000000_DB7D590C08AF3CDB%%+UNKN.bnry";
             var ListOfBytes = File.ReadAllBytes(path);
-            var Version = readAFewBytes(ListOfBytes, 4);
-            var doubledWidth = readAFewBytes(ListOfBytes, 4);
-            var height = readAFewBytes(ListOfBytes, 4);
-            var AgeGender = readAFewBytes(ListOfBytes, 4);
-            var Physique = readAFewBytes(ListOfBytes, 1);
-            var ShapeOrNormals = readAFewBytes(ListOfBytes, 1);
-            var minCol = readAFewBytes(ListOfBytes, 4);
-            var maxCol = readAFewBytes(ListOfBytes, 4);
-            var minRow = readAFewBytes(ListOfBytes, 4);
-            var maxRow = readAFewBytes(ListOfBytes, 4);
-            var robeChannel = readAFewBytes(ListOfBytes, 1);
-            var totalBytesInEncodedMap = readAFewBytes(ListOfBytes, 4);
+            var Version = readAFewBytes(ListOfBytes, 4, "version");
+            var doubledWidth = readAFewBytes(ListOfBytes, 4, "doubledwidth");
+            var height = readAFewBytes(ListOfBytes, 4, "height");
+            var AgeGender = readAFewBytes(ListOfBytes, 4, "agegender");
+            var Physique = readAFewBytes(ListOfBytes, 1, "physique");
+            var ShapeOrNormals = readAFewBytes(ListOfBytes, 1, "shapeOrNormals");
+            var minCol = readAFewBytes(ListOfBytes, 4, "minCol");
+            var maxCol = readAFewBytes(ListOfBytes, 4, "maxCol");
+            var minRow = readAFewBytes(ListOfBytes, 4, "minRow");
+            var maxRow = readAFewBytes(ListOfBytes, 4, "maxRow");
+            var robeChannel = readAFewBytes(ListOfBytes, 1, "robeChannel");
+            var totalBytesInEncodedMap = readAFewBytes(ListOfBytes, 4, "totalButes");
             var width = int.Parse(maxCol) - int.Parse(minCol) + 1; ;
-            Console.WriteLine(width);
+            Console.WriteLine(width + " width");
             var numScanLines = int.Parse(maxRow) - int.Parse(minRow) + 1;
-            Console.WriteLine(numScanLines);
-            var scanLineDataSize = readAFewBytes(ListOfBytes, 2);
-            var mbIsCompressed = readAFewBytes(ListOfBytes, 1);
-            var mRobeChannel = readAFewBytes(ListOfBytes, 1);
+            Console.WriteLine(numScanLines + " numScanLines");
+            for (int i = 0; i < numScanLines; i++)
+            {
+                RLEArrayOfPixels.Clear();
 
+
+                var scanLineDataSize = readAFewBytes(ListOfBytes, 2, "scanLineDataSize");
+                var mbIsCompressed = readAFewBytes(ListOfBytes, 1, "mbIsCompressed");
+                var mRobeChannel = readAFewBytes(ListOfBytes, 1, "mRobeChannel");
+                int mUncompressedPixels = 0;
+                if (int.Parse(mbIsCompressed) == 0)
+                {
+                    if (int.Parse(mRobeChannel) == 0)
+                    {
+                        // If robe is present, robe and skin tight are interleaved.  
+                        // i.e. skin tight pixel, robe pixel, skin tight pixel, robe pixel, etc.
+                        // Thus each pixel takes 6 bytes.
+                        mUncompressedPixels = int.Parse(readAFewBytes(ListOfBytes, width * 6, "mUncompressedPixels"));
+                    }
+                    else
+                    {
+                        mUncompressedPixels = int.Parse(readAFewBytes(ListOfBytes, width * 3, "mUncompressedPixels"));
+                    }
+                }
+                else
+                {
+                    int numIndexes = int.Parse(readAFewBytes(ListOfBytes, 1, "numIndexes") ); // must be > 1
+
+                    // The goal of having index tables (mPixelPosIndexes & mDataPosIndexes) is to provide faster shortcuts 
+                    // into the RLE data where run-time client can start decoding data to obtain a value at a particular pixel 
+                    // position x without decoding the entire preceding scanline.
+                    // See DMap-To-BMP.sc for examples on how to used these indexes.
+                    int mPixelPosIndexes = int.Parse(readAFewBytes(ListOfBytes, 2, "mPixelPosIndexes"));
+                    int mDataPosIndexes = int.Parse(readAFewBytes(ListOfBytes, 2, "mDataPosIndexes"));
+
+                    int headerdatasize = 4 + 1 + (4 * numIndexes);
+
+                    // The RLE data is an array if chars, organized as follows:
+                    //  Byte 0      : Size of run
+                    //  Byte 1,2,3  : Pixel info for skin tight data
+                    //  Byte 4,5,6  : Pixel info for robe data (if present)
+                    //  Repeat
+                    int mRLEArrayOfPixelsVar = int.Parse(readAFewBytes(ListOfBytes, int.Parse(scanLineDataSize) - headerdatasize, "mRLEArrayOfPixelsVar", false));
+                    List<int> mRLEArrayOfPixels = RLEArrayOfPixels;
+                }
+
+            }
         }
 
+        List<int> RLEArrayOfPixels = new List<int>();
+
         int amountOfBytesRead;
-        public string readAFewBytes(byte[] file, int amountOfBytesToRead)
+        public string readAFewBytes(byte[] file, int amountOfBytesToRead, string stringToDisplay, bool shouldParseAsWholeOrOneByOne = true)
         {
             string fewBytes = System.String.Empty;
             var temporaryBytesRead = 0;
@@ -72,21 +116,33 @@ namespace Dmap_decoder
                 if (((amountOfBytesToRead + amountOfBytesRead) - i) == 1)
                 {
                     byteHolder = temporaryByteHolder.ToArray();
-                    if (byteHolder.Length == 4)
+                    if (shouldParseAsWholeOrOneByOne == true)
                     {
-                        fewBytes = BitConverter.ToInt32(byteHolder, 0).ToString();
+                        if (byteHolder.Length == 4)
+                        {
+                            fewBytes = BitConverter.ToInt32(byteHolder, 0).ToString();
+
+                        }
+                        else if (byteHolder.Length == 2)
+                        {
+                            fewBytes = BitConverter.ToInt16(byteHolder, 0).ToString();
+                        }
+
+                        else
+                        {
+                            fewBytes = byteHolder[0].ToString();
+                        }
+                    }
+                    if (shouldParseAsWholeOrOneByOne == false)
+                    {
+                        for (int z = 0; z < byteHolder.Length; z++)
+                        {
+                            fewBytes = 0.ToString();
+                            RLEArrayOfPixels.Add(byteHolder[z]);
+                        }
 
                     }
-                   else if (byteHolder.Length == 2)
-                    {
-                        fewBytes = BitConverter.ToInt16(byteHolder, 0).ToString();
-                    }
-
-                    else
-                    {
-                        fewBytes = byteHolder[0].ToString();
-                    }
-                    Console.WriteLine(fewBytes);
+                    Console.WriteLine(fewBytes + " " + stringToDisplay);
                 }
             }
             amountOfBytesRead += temporaryBytesRead;
