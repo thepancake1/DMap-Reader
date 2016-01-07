@@ -47,13 +47,20 @@ namespace Dmap_decoder
         {
             string fewBytes = System.String.Empty;
             var temporaryBytesRead = 0;
+            byte[] byteHolder;
+            List<byte> temporaryByteHolder = new List<byte>();
             for (int i = 0 + amountOfBytesRead; i < amountOfBytesToRead + amountOfBytesRead; i++)
             {
                 //Console.WriteLine(amountOfBytesToRead);
                 //Console.WriteLine(amountOfBytesRead);
-                fewBytes += file[i];
-                Console.WriteLine(fewBytes);
                 temporaryBytesRead++;
+                temporaryByteHolder.Add(file[i]);
+                if (((amountOfBytesToRead + amountOfBytesRead) - i) == 1)
+                {
+                    byteHolder = temporaryByteHolder.ToArray();
+                    fewBytes = BitConverter.ToInt32(byteHolder, 0).ToString();
+                    Console.WriteLine(fewBytes);
+                }
             }
             amountOfBytesRead += temporaryBytesRead;
             return fewBytes;
