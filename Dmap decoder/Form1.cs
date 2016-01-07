@@ -32,9 +32,9 @@ namespace Dmap_decoder
 
         public void ReadFile()
         {
-            string path = @"C:\\S4_DB43E069_00000000_DB7D590C08AF3CDB%%+UNKN.bnry";
             var ListOfBytes = File.ReadAllBytes(path);
             var Version = readAFewBytes(ListOfBytes, 4, "version");
+          
             var doubledWidth = readAFewBytes(ListOfBytes, 4, "doubledwidth");
             var height = readAFewBytes(ListOfBytes, 4, "height");
             var AgeGender = readAFewBytes(ListOfBytes, 4, "agegender");
@@ -47,16 +47,16 @@ namespace Dmap_decoder
             var robeChannel = readAFewBytes(ListOfBytes, 1, "robeChannel");
             var totalBytesInEncodedMap = readAFewBytes(ListOfBytes, 4, "totalButes");
             var width = int.Parse(maxCol) - int.Parse(minCol) + 1; ;
-            Console.WriteLine(width + " width");
+            //Console.WriteLine(width + " width");
             var numScanLines = int.Parse(maxRow) - int.Parse(minRow) + 1;
-            Console.WriteLine(numScanLines + " numScanLines");
+            //Console.WriteLine(numScanLines + " numScanLines");
             for (int i = 0; i < numScanLines; i++)
             {
                 RLEArrayOfPixels.Clear();
 
 
                 var scanLineDataSize = int.Parse(readAFewBytes(ListOfBytes, 2, "scanLineDataSize"));
-                Console.WriteLine("scanLineDataSize " + scanLineDataSize.ToString());
+                //Console.WriteLine("scanLineDataSize " + scanLineDataSize.ToString());
                 var mbIsCompressed = readAFewBytes(ListOfBytes, 1, "mbIsCompressed");
                 var mRobeChannel = readAFewBytes(ListOfBytes, 1, "mRobeChannel");
                 int mUncompressedPixels = 0;
@@ -87,37 +87,42 @@ namespace Dmap_decoder
                     }
 
                     int headerdatasize = 4 + 1 + (4 * numIndexes);
-                    Console.WriteLine("HeaderDataSize " + headerdatasize);
+                    //Console.WriteLine("HeaderDataSize " + headerdatasize);
                    
-                    Console.WriteLine("scanLineDataSize " + scanLineDataSize.ToString());
-                    int mRLEArrayOfPixelsVar = int.Parse(readAFewBytes(ListOfBytes,scanLineDataSize - headerdatasize, "mRLEArrayOfPixelsVar", false, true));
+                    //Console.WriteLine("scanLineDataSize " + scanLineDataSize.ToString());
+                    int mRLEArrayOfPixelsVar = int.Parse(readAFewBytes(ListOfBytes,scanLineDataSize - headerdatasize, "mRLEArrayOfPixelsVar", false, true, int.Parse(mRobeChannel)));
                     List<int> mRLEArrayOfPixels = RLEArrayOfPixels;
+
                     for (int x = 0;x < mRLEArrayOfPixels.Count; x++)
                     {
-                        Console.WriteLine("mRLEArrayOfPixels " + mRLEArrayOfPixels[x]);
+                        //Console.WriteLine("mRLEArrayOfPixels " + mRLEArrayOfPixels[x]);
 
                     }
 
                 }
 
             }
+            Console.WriteLine("done!");
         }
+        string path = @"C:\\S4_DB43E069_00000000_8C373912264C8EE1%%+UNKN.bnry";
+
+        List<int> mEditedRLEArrayOfPixels = new List<int>();
 
         List<int> RLEArrayOfPixels = new List<int>();
 
         int amountOfBytesRead;
-        public string readAFewBytes(byte[] file, int amountOfBytesToRead, string stringToDisplay, bool shouldParseAsWholeOrOneByOne = true, bool RLEArray = false)
+        public string readAFewBytes(byte[] file, int amountOfBytesToRead, string stringToDisplay, bool shouldParseAsWholeOrOneByOne = true, bool RLEArray = false, int notRobeChannel = 0)
         {
-            //Console.WriteLine("amountOfBytesToRead " + amountOfBytesToRead);
+            ////Console.WriteLine("amountOfBytesToRead " + amountOfBytesToRead);
             string fewBytes = System.String.Empty;
             var temporaryBytesRead = 0;
             byte[] byteHolder;
             List<byte> temporaryByteHolder = new List<byte>();
             for (int i = 0 + amountOfBytesRead; i < amountOfBytesToRead + amountOfBytesRead; i++)
             {
-                //Console.WriteLine(amountOfBytesToRead);
-                //Console.WriteLine(amountOfBytesRead);
-                //Console.WriteLine(file[i]);
+                ////Console.WriteLine(amountOfBytesToRead);
+                ////Console.WriteLine(amountOfBytesRead);
+                ////Console.WriteLine(file[i]);
 
                 temporaryBytesRead++;
                 temporaryByteHolder.Add(file[i]);
@@ -146,12 +151,41 @@ namespace Dmap_decoder
                         for (int z = 0; z < byteHolder.Length; z++)
                         {
                             fewBytes = 0.ToString();
-                            if(RLEArray == true)
-                            RLEArrayOfPixels.Add(byteHolder[z]);
+                            if (RLEArray == true)
+                            {
+                                int numberToDivide;
+                                if (notRobeChannel == 0)
+                                {
+                                    numberToDivide = 5;
+
+                                }
+                                else
+                                {
+                                    numberToDivide = 3;
+
+                                }
+                                if(z % numberToDivide == 0)
+                                {
+                                    mEditedRLEArrayOfPixels.Add(byteHolder[z]);
+                                }
+                                else
+                                { var multiplied = MultiplyThenRound(byteHolder[z]);
+                                    mEditedRLEArrayOfPixels.Add(multiplied);
+                                    Console.WriteLine(multiplied);
+                                    using (var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
+                                    {
+                                        stream.Position =(i - byteHolder.Length) + z;
+                                        stream.WriteByte(Convert.ToByte(multiplied));
+                                        stream.Close();
+                                    }
+                                }
+                                RLEArrayOfPixels.Add(byteHolder[z]);
+
+                            }
                         }
 
                     }
-                    Console.WriteLine(stringToDisplay + " " +  fewBytes.ToString());
+                    //Console.WriteLine(stringToDisplay + " " +  fewBytes.ToString());
                 }
             }
             amountOfBytesRead += temporaryBytesRead;
@@ -162,11 +196,51 @@ namespace Dmap_decoder
         {
 
         }
+        int MultiplyThenRound(float a)
+        {
+
+
+
+            float multi = 0;
+
+
+            if (a > 128)
+            {
+                multi = a * 1.5f;
+            }
+            if (a == 128)
+            {
+                multi = 128;
+
+            }
+            if (a < 128)
+            {
+                multi = a * 0.667f;
+            }
+            if (multi > 255)
+            {
+                multi = 255;
+            }
+            if (multi < 0)
+            {
+                multi = 0;
+            }
+            return Convert.ToInt32(Math.Round(multi));
+
+
+        }
+
+
+
+
+
+
+
     }
-        
 
 
 
-    }
+
+}
 
 
