@@ -39,6 +39,8 @@ namespace Dmap_decoder
             var doubledWidth = readAFewBytes(ListOfBytes, 4);
             var height = readAFewBytes(ListOfBytes, 4);
             var AgeGender = readAFewBytes(ListOfBytes, 4);
+            var Physique = readAFewBytes(ListOfBytes, 1);
+            var ShapeOrVertex = readAFewBytes(ListOfBytes, 1);
 
         }
 
@@ -58,7 +60,15 @@ namespace Dmap_decoder
                 if (((amountOfBytesToRead + amountOfBytesRead) - i) == 1)
                 {
                     byteHolder = temporaryByteHolder.ToArray();
-                    fewBytes = BitConverter.ToInt32(byteHolder, 0).ToString();
+                    if (byteHolder.Length != 1)
+                    {
+                        fewBytes = BitConverter.ToInt32(byteHolder, 0).ToString();
+                    }
+
+                    else
+                    {
+                        fewBytes = byteHolder[0].ToString();
+                    }
                     Console.WriteLine(fewBytes);
                 }
             }
