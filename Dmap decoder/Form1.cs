@@ -47,11 +47,12 @@ namespace Dmap_decoder
         {
             string fewBytes = System.String.Empty;
             var temporaryBytesRead = 0;
-            for (int i = 0 + amountOfBytesRead; i < amountOfBytesToRead + amountOfBytesRead + 1; i++)
+            for (int i = 0 + amountOfBytesRead; i < amountOfBytesToRead + amountOfBytesRead; i++)
             {
-                //Console.WriteLine(amountOfBytesToRead + amountOfBytesRead);
-                Console.WriteLine(amountOfBytesRead);
+                //Console.WriteLine(amountOfBytesToRead);
+                //Console.WriteLine(amountOfBytesRead);
                 fewBytes += file[i];
+                Console.WriteLine(fewBytes);
                 temporaryBytesRead++;
             }
             amountOfBytesRead += temporaryBytesRead;
