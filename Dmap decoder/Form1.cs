@@ -13,8 +13,7 @@ namespace Dmap_decoder
 {
     public partial class Form1 : Form
     {
-        FileAttributes FileInfo;
-        public List<FileAttributes> Unused = new List<FileAttributes>();
+      
 
         public Form1()
         {
@@ -45,7 +44,12 @@ namespace Dmap_decoder
             var maxCol = readAFewBytes(ListOfBytes, 4);
             var minRow = readAFewBytes(ListOfBytes, 4);
             var maxRow = readAFewBytes(ListOfBytes, 4);
-
+            var robeChannel = readAFewBytes(ListOfBytes, 1);
+            var totalBytesInEncodedMap = readAFewBytes(ListOfBytes, 4);
+            var width = int.Parse(maxCol) - int.Parse(minCol) + 1; ;
+            Console.WriteLine(width);
+            var numScanLines = int.Parse(maxRow) - int.Parse(minRow) + 1;
+            Console.WriteLine(numScanLines);
         }
 
         int amountOfBytesRead;
@@ -82,21 +86,6 @@ namespace Dmap_decoder
 
 
     }
-    public class FileAttributes
-    {
-        public int Physique, ShapeOrNormals, RobeChannel, version, dmap_doubled_width, height, AgeGender;
-        FileAttributes(char _Physique, char _ShapeOrNormals, char _RobeChannel, int _version, int _dmap_doubled_width, int _height, int _AgeGender)
-        {
-            Physique = _Physique;
-            ShapeOrNormals = _ShapeOrNormals;
-            RobeChannel = _RobeChannel;
-            version = _version;
-            dmap_doubled_width = _dmap_doubled_width;
-            height = _height;
-            AgeGender = _AgeGender;
-
-        }
-
         
 
 
