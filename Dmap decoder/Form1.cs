@@ -174,7 +174,7 @@ namespace Dmap_decoder
                                     using (var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
                                     {
                                         stream.Position =((i - byteHolder.Length) + z) + 1;
-                                        stream.WriteByte(Convert.ToByte(byteHolder[z]));
+                                        stream.WriteByte(Convert.ToByte(multiplied));
                                         stream.Close();
                                     }
                                 }
