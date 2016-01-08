@@ -156,12 +156,12 @@ namespace Dmap_decoder
                                 int numberToDivide;
                                 if (notRobeChannel == 0)
                                 {
-                                    numberToDivide = 5;
+                                    numberToDivide = 7;
 
                                 }
                                 else
                                 {
-                                    numberToDivide = 3;
+                                    numberToDivide = 5;
 
                                 }
                                 if(z % numberToDivide == 0)
