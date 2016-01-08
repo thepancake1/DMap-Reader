@@ -108,7 +108,6 @@ namespace Dmap_decoder
             Console.WriteLine("done!");
         }
         string path = @"C:\\S4_DB43E069_00000000_C2958869FBB37901%%+UNKN.bnry";
-
         List<int> mEditedRLEArrayOfPixels = new List<int>();
 
         List<int> RLEArrayOfPixels = new List<int>();
@@ -219,16 +218,20 @@ namespace Dmap_decoder
         {
 
         }
-        float MultiplyThenRound(int a)
+        int MultiplyThenRound(float a)
         {
 
-            Console.WriteLine("Input number is " + a);
+           // Console.WriteLine("Input number is " + a);
 
-            float multi = 0;
+            float multi = a;
             float distanceFrom128 = a - 128;
 
+
+            if(a != 128)
                 multi = a * ((a / 128) * (a / 120));
-            Console.WriteLine("Multiplied is " + multi);
+
+           
+           // Console.WriteLine("Multiplied is " + multi);
            
 
             if (multi > 255)
