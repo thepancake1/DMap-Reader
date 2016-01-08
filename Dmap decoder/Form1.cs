@@ -30,6 +30,9 @@ namespace Dmap_decoder
             ReadFile();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void ReadFile()
         {
             var ListOfBytes = File.ReadAllBytes(path);
@@ -64,11 +67,11 @@ namespace Dmap_decoder
                 {
                     if (int.Parse(mRobeChannel) == 0)
                     {
-                        mUncompressedPixels = int.Parse(readAFewBytes(ListOfBytes, width * 6, "mUncompressedPixels"));
+                        mUncompressedPixels = int.Parse(readAFewBytes(ListOfBytes, width * 6, "mUncompressedPixels", false, true, int.Parse(mRobeChannel), true));
                     }
                     else
                     {
-                        mUncompressedPixels = int.Parse(readAFewBytes(ListOfBytes, width * 3, "mUncompressedPixels"));
+                        mUncompressedPixels = int.Parse(readAFewBytes(ListOfBytes, width * 3, "mUncompressedPixels", false, true, int.Parse(mRobeChannel), true));
                     }
                 }
                 else
@@ -111,7 +114,7 @@ namespace Dmap_decoder
         List<int> RLEArrayOfPixels = new List<int>();
 
         int amountOfBytesRead;
-        public string readAFewBytes(byte[] file, int amountOfBytesToRead, string stringToDisplay, bool shouldParseAsWholeOrOneByOne = true, bool RLEArray = false, int notRobeChannel = 0)
+        public string readAFewBytes(byte[] file, int amountOfBytesToRead, string stringToDisplay, bool shouldParseAsWholeOrOneByOne = true, bool RLEArray = false, int notRobeChannel = 0, bool uncompressed = false)
         {
             ////Console.WriteLine("amountOfBytesToRead " + amountOfBytesToRead);
             string fewBytes = System.String.Empty;
@@ -151,35 +154,50 @@ namespace Dmap_decoder
                         for (int z = 0; z < byteHolder.Length; z++)
                         {
                             fewBytes = 0.ToString();
-                            if (RLEArray == true)
+                            if (uncompressed == false)
                             {
-                                int numberToDivide;
-                                if (notRobeChannel == 0)
+                                if (RLEArray == true)
                                 {
-                                    numberToDivide = 7;
+                                    int numberToDivide;
+                                    if (notRobeChannel == 0)
+                                    {
+                                        numberToDivide = 7;
 
-                                }
-                                else
-                                {
-                                    numberToDivide = 5;
+                                    }
+                                    else
+                                    {
+                                        numberToDivide = 4;
 
+                                    }
+                                    if (z % numberToDivide == 0)
+                                    {
+                                        mEditedRLEArrayOfPixels.Add(byteHolder[z]);
+                                    }
+                                    else
+                                    {
+                                        var multiplied = MultiplyThenRound(byteHolder[z]);
+                                        Console.WriteLine(multiplied);
+                                        using (var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
+                                        {
+                                            stream.Position = ((i - byteHolder.Length) + z) + 1;
+                                            stream.WriteByte(Convert.ToByte(multiplied));
+                                            stream.Close();
+                                        }
+                                    }
+                                    RLEArrayOfPixels.Add(byteHolder[z]);
                                 }
-                                if(z % numberToDivide == 0)
+
+                                else if (uncompressed == true)
                                 {
-                                    mEditedRLEArrayOfPixels.Add(byteHolder[z]);
-                                }
-                                else
-                                { var multiplied = MultiplyThenRound(byteHolder[z]);
+                                    var multiplied = MultiplyThenRound(byteHolder[z]);
                                     Console.WriteLine(multiplied);
                                     using (var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
                                     {
-                                        stream.Position =((i - byteHolder.Length) + z) + 1;
+                                        stream.Position = ((i - byteHolder.Length) + z) + 1;
                                         stream.WriteByte(Convert.ToByte(multiplied));
                                         stream.Close();
                                     }
                                 }
-                                RLEArrayOfPixels.Add(byteHolder[z]);
-
                             }
                         }
 
@@ -205,7 +223,7 @@ namespace Dmap_decoder
 
             if (a > 128)
             {
-                multi = a * 1.5f;
+                multi = a * 1.2f;
             }
             if (a == 128)
             {
@@ -214,7 +232,7 @@ namespace Dmap_decoder
             }
             if (a < 128)
             {
-                multi = a * 0.667f;
+                multi = a * 0.833f;
             }
             if (multi > 255)
             {
