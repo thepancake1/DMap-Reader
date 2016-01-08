@@ -170,11 +170,10 @@ namespace Dmap_decoder
                                 }
                                 else
                                 { var multiplied = MultiplyThenRound(byteHolder[z]);
-                                    mEditedRLEArrayOfPixels.Add(multiplied);
                                     Console.WriteLine(multiplied);
                                     using (var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
                                     {
-                                        stream.Position =(i - byteHolder.Length) + z;
+                                        stream.Position =((i - byteHolder.Length) + z) + 1;
                                         stream.WriteByte(Convert.ToByte(byteHolder[z]));
                                         stream.Close();
                                     }
