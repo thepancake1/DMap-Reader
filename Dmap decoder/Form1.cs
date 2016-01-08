@@ -107,7 +107,7 @@ namespace Dmap_decoder
             }
             Console.WriteLine("done!");
         }
-        string path = @"C:\\S4_DB43E069_00000000_D22D2533D93C371B%%+UNKN.bnry";
+        string path = @"C:\\S4_DB43E069_00000000_C2958869FBB37901%%+UNKN.bnry";
 
         List<int> mEditedRLEArrayOfPixels = new List<int>();
 
@@ -198,7 +198,7 @@ namespace Dmap_decoder
                             for (int z = 0; z < byteHolder.Length; z++)
                             {
                                 var multiplied = MultiplyThenRound(byteHolder[z]);
-                                Console.WriteLine(multiplied);
+                                Console.WriteLine("Final number is " + multiplied);
                                 using (var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
                                 {
                                     stream.Position = ((i - byteHolder.Length) + z) + 1;
@@ -219,16 +219,16 @@ namespace Dmap_decoder
         {
 
         }
-        int MultiplyThenRound(int a)
+        float MultiplyThenRound(int a)
         {
 
-
+            Console.WriteLine("Input number is " + a);
 
             float multi = 0;
-            int distanceFrom128 = a - 128;
+            float distanceFrom128 = a - 128;
 
                 multi = a * ((a / 128) * (a / 120));
-
+            Console.WriteLine("Multiplied is " + multi);
            
 
             if (multi > 255)
