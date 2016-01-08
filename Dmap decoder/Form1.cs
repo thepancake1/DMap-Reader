@@ -107,7 +107,7 @@ namespace Dmap_decoder
             }
             Console.WriteLine("done!");
         }
-        string path = @"C:\\S4_DB43E069_00000000_8C373912264C8EE1%%+UNKN.bnry";
+        string path = @"C:\\S4_DB43E069_00000000_D22D2533D93C371B%%+UNKN.bnry";
 
         List<int> mEditedRLEArrayOfPixels = new List<int>();
 
@@ -151,11 +151,13 @@ namespace Dmap_decoder
                     }
                     if (shouldParseAsWholeOrOneByOne == false)
                     {
-                        for (int z = 0; z < byteHolder.Length; z++)
+                        fewBytes = 0.ToString();
+
+                        if (uncompressed == false)
                         {
-                            fewBytes = 0.ToString();
-                            if (uncompressed == false)
+                            for (int z = 0; z < byteHolder.Length; z++)
                             {
+
                                 if (RLEArray == true)
                                 {
                                     int numberToDivide;
@@ -186,21 +188,25 @@ namespace Dmap_decoder
                                     }
                                     RLEArrayOfPixels.Add(byteHolder[z]);
                                 }
-
-                                else if (uncompressed == true)
-                                {
-                                    var multiplied = MultiplyThenRound(byteHolder[z]);
-                                    Console.WriteLine(multiplied);
-                                    using (var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
-                                    {
-                                        stream.Position = ((i - byteHolder.Length) + z) + 1;
-                                        stream.WriteByte(Convert.ToByte(multiplied));
-                                        stream.Close();
-                                    }
-                                }
                             }
                         }
 
+
+
+                        else if (uncompressed == true)
+                        {
+                            for (int z = 0; z < byteHolder.Length; z++)
+                            {
+                                var multiplied = MultiplyThenRound(byteHolder[z]);
+                                Console.WriteLine(multiplied);
+                                using (var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
+                                {
+                                    stream.Position = ((i - byteHolder.Length) + z) + 1;
+                                    stream.WriteByte(Convert.ToByte(multiplied));
+                                    stream.Close();
+                                }
+                            }
+                        }
                     }
                     //Console.WriteLine(stringToDisplay + " " +  fewBytes.ToString());
                 }
@@ -213,27 +219,18 @@ namespace Dmap_decoder
         {
 
         }
-        int MultiplyThenRound(float a)
+        int MultiplyThenRound(int a)
         {
 
 
 
             float multi = 0;
+            int distanceFrom128 = a - 128;
 
+                multi = a * ((a / 128) * (a / 120));
 
-            if (a > 128)
-            {
-                multi = a * 1.2f;
-            }
-            if (a == 128)
-            {
-                multi = 128;
+           
 
-            }
-            if (a < 128)
-            {
-                multi = a * 0.833f;
-            }
             if (multi > 255)
             {
                 multi = 255;
