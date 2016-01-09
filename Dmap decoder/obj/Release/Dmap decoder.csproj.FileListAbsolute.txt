@@ -1,0 +1,9 @@
+C:\Users\user\Documents\Visual Studio 2015\Projects\Dmap decoder\Dmap decoder\bin\Release\Dmap decoder.exe.config
+C:\Users\user\Documents\Visual Studio 2015\Projects\Dmap decoder\Dmap decoder\bin\Release\Dmap decoder.exe
+C:\Users\user\Documents\Visual Studio 2015\Projects\Dmap decoder\Dmap decoder\bin\Release\Dmap decoder.pdb
+C:\Users\user\Documents\Visual Studio 2015\Projects\Dmap decoder\Dmap decoder\obj\Release\Dmap decoder.csprojResolveAssemblyReference.cache
+C:\Users\user\Documents\Visual Studio 2015\Projects\Dmap decoder\Dmap decoder\obj\Release\Dmap_decoder.Form1.resources
+C:\Users\user\Documents\Visual Studio 2015\Projects\Dmap decoder\Dmap decoder\obj\Release\Dmap_decoder.Properties.Resources.resources
+C:\Users\user\Documents\Visual Studio 2015\Projects\Dmap decoder\Dmap decoder\obj\Release\Dmap decoder.csproj.GenerateResource.Cache
+C:\Users\user\Documents\Visual Studio 2015\Projects\Dmap decoder\Dmap decoder\obj\Release\Dmap decoder.exe
+C:\Users\user\Documents\Visual Studio 2015\Projects\Dmap decoder\Dmap decoder\obj\Release\Dmap decoder.pdb

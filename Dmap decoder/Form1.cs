@@ -27,15 +27,26 @@ namespace Dmap_decoder
 
         private void button1_Click(object sender, EventArgs e)
         {
+            string[] array = Directory.GetFiles(@"C:\Users\user\Desktop\thingy");
+            for (int i = 0; i < array.Length; i++)
+            {
+                amountOfBytesRead = 0;
+                currentFile = array[i];
+
             ReadFile();
+            }
         }
 
         /// <summary>
         /// 
         /// </summary>
+        /// 
+        public string currentFile;
         public void ReadFile()
         {
-            var ListOfBytes = File.ReadAllBytes(path);
+
+
+            var ListOfBytes = File.ReadAllBytes(currentFile);
             var Version = readAFewBytes(ListOfBytes, 4, "version");
           
             var doubledWidth = readAFewBytes(ListOfBytes, 4, "doubledwidth");
@@ -107,7 +118,6 @@ namespace Dmap_decoder
             }
             Console.WriteLine("done!");
         }
-        string path = @"C:\\S4_DB43E069_00000000_C2958869FBB37901%%+UNKN.bnry";
         List<int> mEditedRLEArrayOfPixels = new List<int>();
 
         List<int> RLEArrayOfPixels = new List<int>();
@@ -178,7 +188,7 @@ namespace Dmap_decoder
                                     {
                                         var multiplied = MultiplyThenRound(byteHolder[z]);
                                         Console.WriteLine(multiplied);
-                                        using (var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
+                                        using (var stream = new FileStream(currentFile, FileMode.Open, FileAccess.ReadWrite))
                                         {
                                             stream.Position = ((i - byteHolder.Length) + z) + 1;
                                             stream.WriteByte(Convert.ToByte(multiplied));
@@ -198,7 +208,7 @@ namespace Dmap_decoder
                             {
                                 var multiplied = MultiplyThenRound(byteHolder[z]);
                                 Console.WriteLine("Final number is " + multiplied);
-                                using (var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
+                                using (var stream = new FileStream(currentFile, FileMode.Open, FileAccess.ReadWrite))
                                 {
                                     stream.Position = ((i - byteHolder.Length) + z) + 1;
                                     stream.WriteByte(Convert.ToByte(multiplied));
